@@ -77,5 +77,7 @@ def fetch_teams():
     return jsonify(cache["data"])
 
 if __name__ == "__main__":
-    update_cache()  # Populate cache initially
-    app.run(debug=True)
+    app.run()
+
+if __name__ == "main" or __name__ == "gunicorn":
+    update_cache()
