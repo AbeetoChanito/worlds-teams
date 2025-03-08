@@ -1,12 +1,19 @@
 import os
 import requests
+import time
 from collections import defaultdict
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify
 
 load_dotenv()
 
 app = Flask(__name__)
+
+cache = {
+    "data": None,
+    "timestamp": 0
+}
+CACHE_DURATION = 300
 
 def get_teams(world_championship_id):
     ROBOTEVENTS_API_KEY = os.getenv("ROBOTEVENTS_API_KEY")
@@ -37,8 +44,7 @@ def get_teams(world_championship_id):
     
     return all_teams
 
-@app.route("/teams", methods=["GET"])
-def fetch_teams():
+def update_cache():
     HS_WORLD_CHAMPIONSHIP_ID = os.getenv("HS_WORLD_CHAMPIONSHIP_ID")
     MS_WORLD_CHAMPIONSHIP_ID = os.getenv("MS_WORLD_CHAMPIONSHIP_ID")
     
@@ -61,7 +67,15 @@ def fetch_teams():
     
     sorted_result = [{"team_number": org, "qualifications": sorted(letters)} for org, letters in sorted_teams]
     
-    return jsonify(sorted_result)
+    cache["data"] = sorted_result
+    cache["timestamp"] = time.time()
+
+@app.route("/teams", methods=["GET"])
+def fetch_teams():
+    if time.time() - cache["timestamp"] > CACHE_DURATION:
+        update_cache()
+    return jsonify(cache["data"])
 
 if __name__ == "__main__":
+    update_cache()  # Populate cache initially
     app.run(debug=True)
