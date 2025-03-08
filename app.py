@@ -52,8 +52,7 @@ def update_cache():
         org_number = ''.join(filter(str.isdigit, team))
         letter = ''.join(filter(str.isalpha, team))
         team_counts[org_number].append(letter)
-    filtered_teams = {org: letters for org, letters in team_counts.items() if len(letters) > 1}
-    sorted_teams = sorted(filtered_teams.items(), key=lambda x: len(x[1]), reverse=True)
+    sorted_teams = sorted(team_counts.items(), key=lambda x: len(x[1]), reverse=True)
     sorted_result = [{"team_number": org, "qualifications": sorted(letters)} for org, letters in sorted_teams]
     cache["data"] = sorted_result
     cache["timestamp"] = time.time()
