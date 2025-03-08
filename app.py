@@ -37,10 +37,6 @@ def get_teams(world_championship_id):
     
     return all_teams
 
-@app.route("/")
-def home():
-    return render_template("index.html")
-
 @app.route("/teams", methods=["GET"])
 def fetch_teams():
     HS_WORLD_CHAMPIONSHIP_ID = os.getenv("HS_WORLD_CHAMPIONSHIP_ID")
